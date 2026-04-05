@@ -277,7 +277,8 @@ function CellContent({ col, row }: { col: ColDef; row: IShotlistRow }) {
         </span>
       );
     case "sceneNumber":
-      return <TextCell value={row.sceneNumber} tramlineId={t} field="sceneNumber" align="center" bold />;
+      // Master-Slave: Scene# bị khoá — chỉ đổi được từ Break Scene label trên canvas
+      return <SceneNumberCell sceneNumber={row.sceneNumber} />;
     case "location":
       return <TextCell value={row.location} tramlineId={t} field="location" />;
     case "shotName":
@@ -311,6 +312,121 @@ function CellContent({ col, row }: { col: ColDef; row: IShotlistRow }) {
     default:
       return null;
   }
+}
+
+// ─── Scene Number Cell (read-only, Master-Slave) ─────────────────────────────
+//
+// Scene# bị KHÓA tại đây — nguồn sự thật duy nhất là Label trên Break Scene
+// trong canvas kịch bản. Khi user click, tooltip giải thích lý do.
+
+function SceneNumberCell({ sceneNumber }: { sceneNumber: string }) {
+  const [tooltipVisible, setTooltipVisible] = React.useState(false);
+  const wrapRef = React.useRef<HTMLDivElement>(null);
+
+  // Đóng tooltip khi click/touch ra ngoài
+  React.useEffect(() => {
+    if (!tooltipVisible) return;
+    const handler = (e: PointerEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) {
+        setTooltipVisible(false);
+      }
+    };
+    document.addEventListener("pointerdown", handler, true);
+    return () => document.removeEventListener("pointerdown", handler, true);
+  }, [tooltipVisible]);
+
+  return (
+    <div ref={wrapRef} style={{ position: "relative" }}>
+      {/* Badge read-only — click/tap để xem giải thích */}
+      <div
+        role="button"
+        tabIndex={0}
+        aria-label={`Scene ${sceneNumber || "—"} — read-only`}
+        title="Không thể đổi Scene# tại đây. Hãy đổi trên Label của đường Break Scene bên kịch bản"
+        onClick={() => setTooltipVisible((v) => !v)}
+        onKeyDown={(e) => e.key === "Enter" && setTooltipVisible((v) => !v)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 4,
+          fontFamily: FONT,
+          fontSize: 12,
+          fontWeight: 700,
+          color: "#6366f1",
+          textAlign: "center",
+          padding: "3px 6px",
+          borderRadius: 4,
+          background: "rgba(99,102,241,0.08)",
+          border: "1px dashed rgba(99,102,241,0.28)",
+          cursor: "not-allowed",
+          userSelect: "none",
+          whiteSpace: "nowrap",
+          outline: "none",
+          // Hiệu ứng nhẹ khi focus (keyboard navigation)
+          transition: "background 0.12s",
+        }}
+      >
+        {/* Lock icon */}
+        <svg
+          width="8" height="8"
+          viewBox="0 0 24 24"
+          fill="none" stroke="currentColor"
+          strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+          style={{ flexShrink: 0, opacity: 0.55 }}
+        >
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+        {sceneNumber || "—"}
+      </div>
+
+      {/* Custom tooltip — hoạt động cả iPad (click-triggered) lẫn desktop (hover via title) */}
+      {tooltipVisible && (
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(100% + 8px)",
+            left: 0,
+            background: "#18181B",
+            color: "#E4E4E7",
+            fontSize: 10,
+            fontFamily: FONT,
+            fontWeight: 500,
+            padding: "8px 12px",
+            borderRadius: 7,
+            width: 238,
+            lineHeight: 1.6,
+            zIndex: 999,
+            boxShadow: "0 6px 20px rgba(0,0,0,0.28)",
+            pointerEvents: "none",
+            border: "1px solid rgba(255,255,255,0.07)",
+          }}
+        >
+          {/* Arrow pointer */}
+          <div style={{
+            position: "absolute",
+            top: -5,
+            left: 14,
+            width: 10, height: 10,
+            background: "#18181B",
+            border: "1px solid rgba(255,255,255,0.07)",
+            borderRight: "none",
+            borderBottom: "none",
+            transform: "rotate(45deg)",
+          }} />
+          <span style={{ color: "#818cf8", fontWeight: 700 }}>Scene#</span>
+          {" "}bị khoá tại đây.
+          <br />
+          Hãy đổi trên{" "}
+          <span style={{ color: "#19e66f", fontWeight: 600 }}>Label</span>
+          {" "}của đường{" "}
+          <span style={{ color: "#818cf8", fontWeight: 600 }}>Break Scene</span>
+          {" "}bên kịch bản.
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ─── Load AI Data Button ──────────────────────────────────────────────────────

@@ -67,21 +67,16 @@ function LiningToolbar({
   onResetZoom,
   onTogglePanMode,
 }: Readonly<LiningToolbarProps>) {
-  // Nhóm 1: Scene group (Break Scene)
-  // Nhóm 2: Draw group (Select, Draw, Split)
-  // Nhóm 3: Zoom/Pan group (Zoom In, Zoom Out, Fit, Hand)
-  const sceneTools: { mode: DrawMode; label: string; icon: React.ReactNode }[] = [
-    {
-      mode: "breakscene",
-      label: "Scene",
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12" />
-          <rect x="8" y="8" width="8" height="8" rx="1" />
-        </svg>
-      ),
-    },
-  ];
+  // Nhóm 1: Modes group — Break Scene (indigo) + Draw/Split (green) gộp chung
+  // Nhóm 2: Zoom/Pan group
+  // Break Scene icon: đường ngang + box label ở giữa
+  const breakSceneIcon = (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="12" x2="7" y2="12" />
+      <rect x="7" y="8.5" width="10" height="7" rx="1.5" />
+      <line x1="17" y1="12" x2="21" y2="12" />
+    </svg>
+  );
 
   const drawTools: { mode: DrawMode; label: string; icon: React.ReactNode }[] = [
     {
@@ -149,28 +144,27 @@ function LiningToolbar({
       className="absolute left-3 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20"
       style={{ background: "#F8F7F4", borderRadius: 8, padding: 4, boxShadow: "0 1px 8px rgba(24,24,27,0.12), 0 0 0 1px rgba(24,24,27,0.07)" }}
     >
-      {/* Scene group */}
+      {/* Modes group: Break Scene + Draw/Split/Select — tất cả kề nhau */}
       <div className="flex flex-col gap-1">
-        {sceneTools.map(({ mode, label, icon }) =>
-          renderDrawBtn(mode, label, icon, "#6366f1", "rgba(99,102,241,0.13)", "rgba(99,102,241,0.35)")
-        )}
-      </div>
+        {/* Break Scene — indigo, gộp trực tiếp trên cụm Draw/Split */}
+        {renderDrawBtn("breakscene", "Break", breakSceneIcon, "#6366f1", "rgba(99,102,241,0.13)", "rgba(99,102,241,0.35)")}
 
-      {/* Divider */}
-      <div style={{ height: 1, background: "rgba(24,24,27,0.1)", margin: "0 2px" }} />
+        {/* Separator mỏng giữa Break Scene và các tool vẽ */}
+        <div style={{ height: 1, background: "rgba(24,24,27,0.1)", margin: "1px 4px" }} />
 
-      {/* Draw group — disabled (blur) when Break Scene mode is active */}
-      <div
-        className="flex flex-col gap-1"
-        style={{
-          opacity: isBreakSceneMode ? 0.35 : 1,
-          pointerEvents: isBreakSceneMode ? "none" : "auto",
-          transition: "opacity 0.15s",
-        }}
-      >
-        {drawTools.map(({ mode, label, icon }) =>
-          renderDrawBtn(mode, label, icon, "#16a34a", "rgba(25,230,111,0.15)", "rgba(25,230,111,0.3)")
-        )}
+        {/* Select / Draw / Split — bị tắt khi Break Scene đang active */}
+        <div
+          className="flex flex-col gap-1"
+          style={{
+            opacity: isBreakSceneMode ? 0.30 : 1,
+            pointerEvents: isBreakSceneMode ? "none" : "auto",
+            transition: "opacity 0.15s",
+          }}
+        >
+          {drawTools.map(({ mode, label, icon }) =>
+            renderDrawBtn(mode, label, icon, "#16a34a", "rgba(25,230,111,0.15)", "rgba(25,230,111,0.3)")
+          )}
+        </div>
       </div>
 
       {/* Divider */}
