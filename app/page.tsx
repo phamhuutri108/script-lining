@@ -362,6 +362,15 @@ export default function HomePage() {
       formData.append("file", file);
 
       const res = await fetch("/api/upload", { method: "POST", body: formData });
+
+      // Kiểm tra Content-Type trước khi gọi res.json() —
+      // nếu server trả về HTML báo lỗi (Cloudflare 5xx, Next.js error page...)
+      // thì res.json() sẽ throw SyntaxError và crash app trên iPad.
+      const isJson = res.headers.get("content-type")?.includes("application/json");
+      if (!isJson) {
+        throw new Error(`HTTP ${res.status} — server trả về nội dung không phải JSON`);
+      }
+
       const json = (await res.json()) as { url?: string; error?: string };
 
       if (!res.ok || !json.url) {
