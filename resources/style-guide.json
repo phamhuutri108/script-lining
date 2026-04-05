@@ -1,0 +1,27 @@
+{
+  "theme": "The Editorial Minimalist",
+  "typography": {
+    "body": "IBM Plex Sans, sans-serif",
+    "mono": "IBM Plex Mono, monospace"
+  },
+  "semantic_tokens": {
+    "surface": "bg-surface",
+    "surface_container_lowest": "bg-surface-container-lowest",
+    "surface_container_highest": "bg-surface-container-highest",
+    "on_surface_variant": "text-on-surface-variant"
+  },
+  "breakdown_colors": {
+    "cast": "#FF0000",
+    "stunts": "#FF8C00",
+    "extras-atm": "#228B22",
+    "extras-sil": "#FFD700",
+    "sfx": "#0066CC",
+    "props": "#8B00FF",
+    "vehicle": "#FF69B4",
+    "wardrobe": "#00BFFF",
+    "makeup": "#FF6600",
+    "sound": "#8B4513",
+    "equip": "#C8950A",
+    "notes-col": "#555555"
+  }
+}

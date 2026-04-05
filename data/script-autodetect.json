@@ -1,0 +1,871 @@
+[
+  {
+    "scene_number": "1",
+    "int_ext": "EXT",
+    "location": "QUỐC LỘ 1D",
+    "day_night": "DAY",
+    "subjects": [
+      "DƯƠNG",
+      "xe máy",
+      "container",
+      "ô tô"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "2",
+    "int_ext": "EXT",
+    "location": "BỜ BIỂN/BỆNH VIỆN",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "đồ đạc",
+      "CÂY TO",
+      "TV",
+      "bệnh nhân"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "3",
+    "int_ext": "INT",
+    "location": "NHÀ VĂN",
+    "day_night": "DAY",
+    "subjects": [
+      "VĂN",
+      "gương",
+      "cặp xách"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "4",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN",
+    "day_night": "DAY",
+    "subjects": [
+      "AN",
+      "bức tranh",
+      "bút sáp màu",
+      "Dương",
+      "thức ăn"
+    ],
+    "dialogue": [
+      "DƯƠNG: Lúc nãy con tự vệ sinh cá nhân luôn hả?",
+      "AN: Dạ.",
+      "DƯƠNG: Giỏi quá ta.",
+      "DƯƠNG: Ăn đi con.",
+      "AN: Sao lâu rồi ba không gọi?",
+      "DƯƠNG: Mẹ cũng không biết. Nhưng mẹ nghĩ ba đang bận lắm. Thôi, con ăn \ncho hết đi."
+    ]
+  },
+  {
+    "scene_number": "4A",
+    "int_ext": "EXT",
+    "location": "PHÒNG LÀM VIỆC/HÀNH LANG BỆNH VIỆN",
+    "day_night": "DAY",
+    "subjects": [
+      "Văn",
+      "áo blouse",
+      "NỮ Y TÁ",
+      "ĐỒNG NGHIỆP 1",
+      "ĐỒNG NGHIỆP 2",
+      "Bảng hiệu PHÒNG BÁC SĨ"
+    ],
+    "dialogue": [
+      "ĐỒNG NGHIỆP 1: Chào anh Văn.",
+      "ĐỒNG NGHIỆP 2: Chào bác sĩ.",
+      "VĂN: Chào mọi người."
+    ]
+  },
+  {
+    "scene_number": "4B",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN",
+    "day_night": "DAY",
+    "subjects": [
+      "Văn",
+      "nữ y tá",
+      "An",
+      "Dương",
+      "ống nghe",
+      "dịch truyền"
+    ],
+    "dialogue": [
+      "VĂN: Chào bé An.",
+      "DƯƠNG: Chào bác sĩ.",
+      "AN: Thưa bác.",
+      "VĂN: Vẽ đẹp quá nhỉ. Sau này con muốn làm gì?",
+      "AN: Dạ... Con muốn làm họa sĩ.",
+      "VĂN: Đến giờ khám bệnh rồi.",
+      "VĂN: Hít vào.",
+      "VĂN: Thở ra từ từ.",
+      "VĂN: Cơ thể cháu đang đáp ứng tốt với thuốc. Các chỉ số sinh hóa tích cực\nhơn so với lần xét nghiệm trước. Chúng tôi sẽ tích cực theo dõi thường xuyên.",
+      "DƯƠNG: Cảm ơn anh.",
+      "VĂN: Có vẻ không phải là tin vui với chị thì phải?",
+      "DƯƠNG: Không phải thế.",
+      "VĂN: Vậy... chị đang lo lắng chuyện gì?",
+      "DƯƠNG: Cháu suốt ngày đòi gặp ba nó. Nhưng tôi không thể.",
+      "DƯƠNG: Xin phép bác sĩ."
+    ]
+  },
+  {
+    "scene_number": "5",
+    "int_ext": "EXT",
+    "location": "SÂN CẦU NGUYỆN",
+    "day_night": "DAY",
+    "subjects": [
+      "An",
+      "phấn",
+      "Dương",
+      "ghế đá",
+      "bức tượng Đức Mẹ Maria"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "6",
+    "int_ext": "INT",
+    "location": "PHÒNG LÀM VIỆC",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Văn",
+      "tài liệu",
+      "đồng hồ"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "7",
+    "int_ext": "INT",
+    "location": "PHÒNG KHÁCH/BẾP (NHÀ VĂN)",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Văn",
+      "tô mì",
+      "hồ sơ bệnh án của An",
+      "tờ xét nghiệm máu"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "8",
+    "int_ext": "INT",
+    "location": "PHÒNG NGỦ (NHÀ VĂN)",
+    "day_night": "DAY",
+    "subjects": [
+      "Văn",
+      "tài liệu",
+      "bức ảnh người phụ nữ"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "9",
+    "int_ext": "EXT",
+    "location": "HÀNH LANG BỆNH VIỆN",
+    "day_night": "DAY",
+    "subjects": [
+      "Văn",
+      "BẢNG PHÂN CÔNG TRỰC ĐÊM",
+      "cốc cà phê"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "10",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN",
+    "day_night": "DAY",
+    "subjects": [
+      "An",
+      "sách",
+      "túi xách của mẹ",
+      "điện thoại",
+      "Dương"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "11",
+    "int_ext": "EXT",
+    "location": "HÀNH LANG BỆNH VIỆN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Văn",
+      "Dương"
+    ],
+    "dialogue": [
+      "VĂN: Chị Dương đó hả?",
+      "DƯƠNG: Hôm nay bác sĩ trực đêm hả?",
+      "VĂN: Chị có chuyện gì sao?",
+      "DƯƠNG: Dạ không... không có gì đâu."
+    ]
+  },
+  {
+    "scene_number": "11A",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Dương",
+      "An",
+      "điện thoại",
+      "chăn",
+      "cuộn len"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "12",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Dương",
+      "An",
+      "ly",
+      "nút đỏ KHẨN CẤP",
+      "gối"
+    ],
+    "dialogue": [
+      "DƯƠNG: An ơi, con ơi, con...",
+      "DƯƠNG: BÁC SĨ... BÁC SĨ. Con đừng làm mẹ sợ, con... BÁC SĨ..."
+    ]
+  },
+  {
+    "scene_number": "12A",
+    "int_ext": "EXT",
+    "location": "HÀNH LANG BỆNH VIỆN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Y Tá"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "12B",
+    "int_ext": "EXT",
+    "location": "HÀNH LANG BỆNH VIỆN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Dương",
+      "Văn",
+      "ghế đợi"
+    ],
+    "dialogue": [
+      "VĂN: Đã qua cơn nguy kịch. Chị yên tâm."
+    ]
+  },
+  {
+    "scene_number": "13",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN",
+    "day_night": "DAY",
+    "subjects": [
+      "An",
+      "ống thở oxy",
+      "cửa sổ",
+      "Dương"
+    ],
+    "dialogue": [
+      "AN: Me...eee... Mẹ.",
+      "AN: Me...eee... Mẹ.",
+      "DƯƠNG: Con trai của mẹ... Con khát nước không?",
+      "AN: Con muốn nói chuyện với ba.",
+      "DƯƠNG: Con nghỉ ngơi đi đã... tối nay mẹ sẽ cho con nói chuyện với ba."
+    ]
+  },
+  {
+    "scene_number": "13A",
+    "int_ext": "EXT",
+    "location": "SÂN BÓNG CHUYỀN",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "vài đứa trẻ"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "13B",
+    "int_ext": "EXT",
+    "location": "HÀNH LANG BỆNH VIỆN/PHÒNG LÀM VIỆC",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "bảng PHÒNG BÁC SĨ"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "13C",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "túi xách",
+      "sổ tay",
+      "danh thiếp BÁC SĨ VĂN",
+      "điện thoại"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "14",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN/PHÒNG LÀM VIỆC",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Dương",
+      "An",
+      "cháo",
+      "điện thoại",
+      "cuộn len",
+      "Văn",
+      "hồ sơ bệnh án",
+      "ảnh thẻ của An"
+    ],
+    "dialogue": [
+      "AN: Con gọi ba được chưa?",
+      "DƯƠNG: Con gọi đi.",
+      "VĂN: Alo?",
+      "VĂN: Alo? Ai đó?",
+      "AN: Ba đó hả?",
+      "AN: Phải ba không?",
+      "VĂN: An đó hả? Sao... con lại gọi vào giờ này?",
+      "AN: Con nhớ ba lắm. Sao ba không gọi cho con?",
+      "AN: Hôm trước con gọi cho ba mà ba không nghe máy. Bữa đó con đau lắm.",
+      "AN: Ba đâu rồi?",
+      "AN: Ba ơi?"
+    ]
+  },
+  {
+    "scene_number": "15",
+    "int_ext": "EXT",
+    "location": "HÀNH LANG BỆNH VIỆN",
+    "day_night": "DAY",
+    "subjects": [
+      "Văn"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "15A",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN",
+    "day_night": "DAY",
+    "subjects": [
+      "Văn",
+      "An",
+      "Dương",
+      "cuộn len"
+    ],
+    "dialogue": [
+      "VĂN: Tôi cần gặp chị một chút."
+    ]
+  },
+  {
+    "scene_number": "15B",
+    "int_ext": "EXT",
+    "location": "GIẾNG TRỜI GẦN PHÒNG AN",
+    "day_night": "DAY",
+    "subjects": [
+      "Văn",
+      "Dương",
+      "ghế đợi"
+    ],
+    "dialogue": [
+      "VĂN: Hình như đêm qua cháu gọi cho tôi.",
+      "DƯƠNG: Xin lỗi đã làm phiền bác sĩ... Tôi không biết phải làm gì.",
+      "VĂN: Tôi cũng nghĩ là có một chuyện tế nhị gì đó.",
+      "DƯƠNG: Chồng tôi đi xuất khẩu lao động được mấy năm... Nhưng năm ngoái...\nngười ta báo tin... ảnh bị tai nạn lúc đang làm.",
+      "DƯƠNG: Tôi đã cố giấu An... Thật sự xin lỗi vì đã khiến bác sĩ phải khó \nxử."
+    ]
+  },
+  {
+    "scene_number": "16",
+    "int_ext": "INT",
+    "location": "BAN CÔNG/PHÒNG KHÁCH/PHÒNG NGỦ (NHÀ AN)",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "hũ tro",
+      "CHIẾC TỦ GỖ",
+      "chìa khóa"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "17",
+    "int_ext": "EXT",
+    "location": "BỜ BIỂN",
+    "day_night": "DAY",
+    "subjects": [
+      "Văn",
+      "khăn"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "17A",
+    "int_ext": "INT",
+    "location": "NHÀ VĂN/KHUÔN VIÊN BỆNH VIỆN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Văn",
+      "khăn tắm",
+      "điện thoại",
+      "Dương",
+      "xe lăn",
+      "An",
+      "sách Bác Sĩ Ai-bô-lít"
+    ],
+    "dialogue": [
+      "DƯƠNG: Alo?",
+      "VĂN: An có ở đó không?",
+      "DƯƠNG: Dạ... Có.",
+      "AN: Ba gọi hả mẹ?",
+      "VĂN: Phiền chị... tôi muốn nói chuyện với cháu.",
+      "AN: Ba hả ba?",
+      "VĂN: Con khỏe không?",
+      "AN: Ba gọi là con khỏe liền.",
+      "AN: Mà sao giọng ba nay khác vậy?",
+      "VĂN: À... do ba bị đau họng. Trời lạnh quá.",
+      "AN: Ba đang ở đâu mà lạnh?",
+      "VĂN: Con biết sao không, ba đang công tác ở Nga, mà con biết rồi đó, Nga \nthì lạnh lắm, nên ba mới bị đau họng.",
+      "AN: Quào, ba bay qua Nga luôn hả. Nước Nga có tuyết không ba?",
+      "VĂN: Có chứ con, giờ này ở Nga tuyết phủ khắp nơi.",
+      "AN: Nga có lớn bằng nước Việt Nam mình không ba?",
+      "VĂN: Nước Nga to lớn lắm con ạ. Lớn hơn Việt Nam nhiều lắm.",
+      "AN: Nước Nga có nhiều đồ chơi không ba?"
+    ]
+  },
+  {
+    "scene_number": "18",
+    "int_ext": "EXT",
+    "location": "TRƯỜNG ĐOẠN HỘI THOẠI GIỮA VĂN VÀ AN",
+    "day_night": "DAY",
+    "subjects": [
+      "An",
+      "bút sáp màu",
+      "xe lăn",
+      "Văn",
+      "sách",
+      "Dương",
+      "tranh của An"
+    ],
+    "dialogue": [
+      "AN: Bây giờ ba đang ở đâu?",
+      "VĂN: Bây giờ đó hả... Ba đang ở Ai Cập.",
+      "AN: Tuần sau thì sao?",
+      "VĂN: Hmm... Ba cũng chưa rõ, có thể sẽ là Ấn Độ, hoặc là Mỹ hoặc cũng có \nthể là Hà Lan.",
+      "AN: Con nghe nói ở Trung Quốc có cái thành gì dài lắm, mà người ta nhìn \nđược từ ngoài không gian lận.",
+      "VĂN: Ý con là Vạn Lý Trường Thành đó hả?",
+      "AN: Con có cái này hay lắm, nhưng mà khi nào ba về con mới cho ba xem.",
+      "VĂN: Con không cho ba biết bây giờ được sao?",
+      "AN: Con mà cho ba biết thì ba sẽ không về với con đâu. Nên con sẽ giữ bí \nmật."
+    ]
+  },
+  {
+    "scene_number": "19",
+    "int_ext": "INT",
+    "location": "PHÒNG LÀM VIỆC",
+    "day_night": "DAY",
+    "subjects": [
+      "Văn",
+      "Dương",
+      "tập hồ sơ",
+      "túi quà bọc giấy",
+      "sấp vải may áo dài"
+    ],
+    "dialogue": [
+      "VĂN: Mời vào.",
+      "DƯƠNG: Chào bác sĩ.",
+      "VĂN: Chị đến rồi hả. Mời chị ngồi.",
+      "DƯƠNG: Bé An... sao hả bác sĩ.",
+      "VĂN: Lần xét nghiệm vừa rồi cho thấy các chỉ số của cháu khá ổn định. Các\nổ tế bào ung thư không còn triệu chứng di căn. Điều cháu cần bây giờ là thay đổi\nkhông gian và tăng cường dinh dưỡng.",
+      "VĂN: Tôi nghĩ đây là kết quả từ sự tích cực của cháu và của chị nữa.",
+      "DƯƠNG: Cảm ơn anh đã giúp đỡ mẹ con tôi.",
+      "DƯƠNG: Tôi xin phép... được tặng chị nhà chút quà nhỏ.",
+      "DƯƠNG: Chỉ là sấp vải may áo dài. Xin anh nhận cho tấm lòng của mẹ con \ntôi.",
+      "VĂN: Cảm ơn chị. Tôi xin nhận tấm lòng của chị... nhưng chị cứ giữ lấy để\nsử dụng... Vợ chồng tôi...",
+      "DƯƠNG: Tôi xin lỗi.",
+      "VĂN: Chuyện lâu lắm rồi... Đã 6 năm rồi chị.",
+      "DƯƠNG: Tôi không làm phiền anh nữa.",
+      "VĂN: Chào chị."
+    ]
+  },
+  {
+    "scene_number": "20",
+    "int_ext": "EXT",
+    "location": "BỜ BIỂN GẦN BỆNH VIỆN",
+    "day_night": "DAY",
+    "subjects": [
+      "An",
+      "quả thông",
+      "Dương"
+    ],
+    "dialogue": [
+      "AN: Mấy quả này là quả gì vậy mẹ?",
+      "DƯƠNG: Quả thông đó con.",
+      "AN: Không biết chỗ ba có quả này không?",
+      "DƯƠNG: Mẹ cũng không biết.",
+      "AN: Vậy mẹ cất cho con đi. Con để dành cho ba."
+    ]
+  },
+  {
+    "scene_number": "21",
+    "int_ext": "EXT",
+    "location": "NHÀ AN",
+    "day_night": "DAY",
+    "subjects": [
+      "An",
+      "Dương",
+      "hai chậu cây héo",
+      "balo",
+      "sáp màu",
+      "tập giấy"
+    ],
+    "dialogue": [
+      "DƯƠNG: Sao vậy con?",
+      "AN: Cây bị sao vậy mẹ?",
+      "DƯƠNG: Cây chết rồi.",
+      "AN: Sao mà chết?",
+      "DƯƠNG: Vì mẹ ở bệnh viện chăm con nên không có thời gian chăm cây.",
+      "DƯƠNG: Con ngoan. Mẹ sẽ mua cho con một cây mới.",
+      "DƯƠNG: Con muốn ăn món gì?",
+      "AN: Mẹ nấu gì con cũng ăn hết."
+    ]
+  },
+  {
+    "scene_number": "22",
+    "int_ext": "INT",
+    "location": "NHÀ AN/NHÀ VĂN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Dương",
+      "An",
+      "đĩa táo",
+      "điện thoại",
+      "Văn",
+      "gạt tàn",
+      "ly trà nhỏ",
+      "sách Hoàng Tử Bé"
+    ],
+    "dialogue": [
+      "DƯƠNG: Dừng tay xíu ăn trái cây đi nè.",
+      "DƯƠNG: Con xem ai gọi đó.",
+      "AN: Baaaa.",
+      "AN: Alo ba.",
+      "VĂN: Nghe giọng con hôm nay vui thế?",
+      "AN: Dạ, bác sĩ nói con khỏe lên rồi nên cho con về nhà chơi. Mà ba ơi, \nsao ba chưa về thăm con?",
+      "VĂN: Thật ra, bây giờ ba lại đang phải đi công tác ở Pháp con ạ.",
+      "AN: Ba ơi, Pháp có giống Nga không?",
+      "VĂN: Pháp khác Nga lắm. Nhưng mà mùa đông thì đỡ lạnh hơn nước Nga \nnhiều.",
+      "AN: Vậy ba thích gì nhất ở Pháp?",
+      "VĂN: Ở Pháp có thành phố Paris cổ kính, có nhà thờ Đức Bà. Sáng nào ba \ncũng nghe thấy tiếng chuông ở nhà thờ vang.",
+      "AN: Ba ơi, tiếng chuông đó có giống tiếng chuông ở nhà thờ Việt Nam \nkhông?"
+    ]
+  },
+  {
+    "scene_number": "23",
+    "int_ext": "INT",
+    "location": "NHÀ AN",
+    "day_night": "DAY",
+    "subjects": [
+      "An",
+      "2 chậu cây mới",
+      "Dương",
+      "balo",
+      "cuốn lịch",
+      "CÂY GHIM GIẤY"
+    ],
+    "dialogue": [
+      "DƯƠNG: An ơi.",
+      "AN: Dạ.",
+      "DƯƠNG: Đi thôi con ơi."
+    ]
+  },
+  {
+    "scene_number": "24",
+    "int_ext": "EXT",
+    "location": "VỊNH",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "An",
+      "xe máy"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "25",
+    "int_ext": "EXT",
+    "location": "NGOÀI PHÒNG BỆNH CỦA AN",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "Văn"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "26",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "khăn",
+      "An",
+      "mớ tóc",
+      "cuộn len",
+      "chiếc mũ len",
+      "quyển sách tranh về thiên thần"
+    ],
+    "dialogue": [
+      "AN: Mẹ ơi... Tóc... con...",
+      "AN: Rụng tóc là sắp chết đúng không mẹ?",
+      "DƯƠNG: Không có chuyện đó đâu. Con vẫn còn khỏe lắm.",
+      "DƯƠNG: Con thấy không, đâu còn rụng nữa.",
+      "AN: Mẹ... Con muốn gặp ba.",
+      "DƯƠNG: Ba sắp về rồi. Mẹ hứa sẽ đưa ba đến gặp con.",
+      "DƯƠNG: Trong cuốn sách này là câu chuyện của những thiên thần.",
+      "AN: Thiên thần là gì hả mẹ?",
+      "DƯƠNG: Thiên thần là những đứa trẻ có khả năng làm cho mọi người hạnh \nphúc...",
+      "AN: Con có làm cho mọi người hạnh phúc không mẹ?",
+      "DƯƠNG: Khi con ra đời, con đã mang hạnh phúc đến cho mẹ... Con là thiên \nthần của mẹ."
+    ]
+  },
+  {
+    "scene_number": "27",
+    "int_ext": "EXT",
+    "location": "PHÒNG GIÁM ĐỐC",
+    "day_night": "DAY",
+    "subjects": [
+      "bảng tên màu xanh GIÁM ĐỐC",
+      "Văn",
+      "tờ giấy khổ A4",
+      "GIÁM ĐỐC"
+    ],
+    "dialogue": [
+      "GIÁM ĐỐC: Mời vào.",
+      "GIÁM ĐỐC: Anh ngồi xuống đi.",
+      "GIÁM ĐỐC: Trong đời tôi đã không ít lần bất lực trước căn bệnh này..."
+    ]
+  },
+  {
+    "scene_number": "28",
+    "int_ext": "INT",
+    "location": "PHÒNG LÀM VIỆC",
+    "day_night": "DAY",
+    "subjects": [
+      "Văn",
+      "tập tài liệu",
+      "chiếc điện thoại",
+      "Dương"
+    ],
+    "dialogue": [
+      "DƯƠNG: Anh Văn... An muốn gặp ba nó trực tiếp. Tôi xin anh một lần cuối, \nhãy đến gặp cháu.",
+      "DƯƠNG: Tôi cũng không biết mình đang nói gì nữa. Nhưng tôi có linh cảm."
+    ]
+  },
+  {
+    "scene_number": "29",
+    "int_ext": "EXT",
+    "location": "SÂN BỆNH VIỆN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "bóng đèn điện",
+      "PHÒNG TRỰC CẤP CỨU",
+      "Y Tá"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "29A",
+    "int_ext": "INT",
+    "location": "PHÒNG NGỦ/PHONG KHÁCH (NHÀ VĂN)",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Văn",
+      "điện thoại"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "29B",
+    "int_ext": "EXT",
+    "location": "NGOÀI PHÒNG BỆNH CỦA AN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Dương"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "29C",
+    "int_ext": "EXT",
+    "location": "HÀNH LANG BỆNH VIỆN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Văn",
+      "Dương"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "29D",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Dương",
+      "giường bệnh"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "30",
+    "int_ext": "EXT",
+    "location": "BỆNH VIỆN - MONTAGE",
+    "day_night": "DAY",
+    "subjects": [
+      "xe lăn"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "30A",
+    "int_ext": "INT",
+    "location": "PHÒNG BỆNH CỦA AN",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "Chiếc giường trống",
+      "túi xách"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "31",
+    "int_ext": "INT",
+    "location": "NHÀ AN",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "tấm thảm",
+      "tranh An vẽ",
+      "quần áo của An",
+      "thùng carton",
+      "CHIẾC TỦ GỖ",
+      "hũ tro",
+      "mẫu giấy"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "32",
+    "int_ext": "INT",
+    "location": "NHÀ AN",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "cuốn lịch"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "33",
+    "int_ext": "INT",
+    "location": "BỆNH VIỆN",
+    "day_night": "DAY",
+    "subjects": [
+      "bệnh nhân",
+      "Y tá",
+      "Dương",
+      "cô y tá"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "33A",
+    "int_ext": "EXT",
+    "location": "HÀNH LANG BỆNH VIỆN",
+    "day_night": "DAY",
+    "subjects": [
+      "Văn",
+      "BẢNG PHÂN CÔNG TRỰC ĐÊM",
+      "Dương"
+    ],
+    "dialogue": [
+      "DƯƠNG: Xin lỗi, bác sĩ... có thời gian không?",
+      "VĂN: Tôi sắp hết ca trực.",
+      "DƯƠNG: Tôi xin đợi anh dưới sân."
+    ]
+  },
+  {
+    "scene_number": "34",
+    "int_ext": "EXT",
+    "location": "SÂN CẦU NGUYỆN",
+    "day_night": "DAY",
+    "subjects": [
+      "Dương",
+      "tượng Đức Mẹ",
+      "Văn"
+    ],
+    "dialogue": [
+      "DƯƠNG: Tôi có thể nấu cho anh một bữa cơm không?",
+      "VĂN: Sao chị cần phải làm vậy?",
+      "DƯƠNG: Việc tôi đến đây là mong ước của bé An... Tôi sẽ cho anh biết \ntrong khi ta ăn cơm."
+    ]
+  },
+  {
+    "scene_number": "35",
+    "int_ext": "INT",
+    "location": "NHÀ VĂN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Văn",
+      "Dương",
+      "chiếc bàn gỗ",
+      "bức ảnh trắng đen khổ 20x30"
+    ],
+    "dialogue": []
+  },
+  {
+    "scene_number": "35A",
+    "int_ext": "INT",
+    "location": "BÀN ĂN",
+    "day_night": "NIGHT",
+    "subjects": [
+      "Văn",
+      "Dương",
+      "mâm cơm",
+      "túi xách",
+      "bức thư",
+      "tập giấy A4",
+      "tranh sáp màu"
+    ],
+    "dialogue": [
+      "DƯƠNG: Hy vọng những món này hợp khẩu vị với anh.",
+      "VĂN: Lâu rồi tôi không có một bữa cơm thịnh soạn như vậy.",
+      "DƯƠNG: Cảm ơn anh.",
+      "DƯƠNG: Tôi không biết là anh... cũng có một đứa con trai.",
+      "VĂN: Cháu tên Khoa... Đã 9 năm rồi chị... Cháu cũng mất vì ung thư... \ngiống con trai chị.",
+      "DƯƠNG: Còn mẹ cháu?",
+      "VĂN: Cổ chuyển đi 2 năm sau khi Khoa mất. Tôi đã suy sụp vì không thể cứu\nđược con mình.",
+      "DƯƠNG: Đó là lý do anh dành cho con trai tôi một tình cảm đặc biệt sao?",
+      "DƯƠNG: Vậy thì tại sao đêm đó anh không đến?... TẠI SAO?",
+      "DƯƠNG: An đã đợi anh rất lâu.",
+      "DƯƠNG: Tôi đã cầu mong anh xuất hiện bên cạnh con trai tôi.",
+      "DƯƠNG: Đến giây phút cuối, nó vẫn giữ trong tay chiếc điện thoại.",
+      "VĂN: Tôi sợ... Hãy tha thứ cho tôi.",
+      "VĂN: Tôi sợ... An biết tôi nói dối cháu.",
+      "DƯƠNG: An đã biết tất cả... và muốn tôi đến gặp anh.",
+      "DƯƠNG: Anh Văn... An đã cảm nhận được tình thương của anh."
+    ]
+  }
+]

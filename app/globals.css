@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Variables (shadcn/ui compatible) ──────────────────────────────────── */
+@layer base {
+  :root {
+    /* Editorial Minimalist — Light Mode */
+    --background:           248 244 240;   /* #F8F7F4 off-white canvas */
+    --foreground:           240 3.7% 10.9%;/* #18181B off-black ink */
+
+    --card:                 0 0% 100%;
+    --card-foreground:      240 3.7% 10.9%;
+
+    --popover:              0 0% 100%;
+    --popover-foreground:   240 3.7% 10.9%;
+
+    --primary:              142 76% 50%;   /* #19e66f sage green accent */
+    --primary-foreground:   240 3.7% 10.9%;
+
+    --secondary:            240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+
+    --muted:                240 4.8% 95.9%;
+    --muted-foreground:     240 3.8% 46.1%;
+
+    --accent:               142 76% 50%;
+    --accent-foreground:    240 3.7% 10.9%;
+
+    --destructive:          0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border:               240 5.9% 90%;
+    --input:                240 5.9% 90%;
+    --ring:                 142 76% 50%;
+
+    --radius:               0.5rem;
+  }
+}
+
+/* ── Base Resets ────────────────────────────────────────────────────────────── */
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #F8F7F4;
+    color: #18181B;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    line-height: 1.5;
+  }
+
+  /* Scrollbar — Editorial thin style */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(24, 24, 27, 0.15);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(24, 24, 27, 0.28);
+  }
+
+  /* Focus ring uses accent */
+  *:focus-visible {
+    outline: 2px solid #19e66f;
+    outline-offset: 2px;
+  }
+
+  select option {
+    background: #F8F7F4;
+    color: #18181B;
+  }
+}
+
+/* ── Shotlist Table Frozen Column Shadow ───────────────────────────────────── */
+@layer components {
+  .frozen-shadow::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -8px;
+    bottom: 0;
+    width: 8px;
+    background: linear-gradient(to right, rgba(24,24,27,0.06), transparent);
+    pointer-events: none;
+  }
+}
