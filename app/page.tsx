@@ -363,16 +363,19 @@ export default function HomePage() {
 
       const res = await fetch("/api/upload", { method: "POST", body: formData });
 
-      // Kiểm tra Content-Type trước khi gọi res.json() —
-      // nếu server trả về HTML báo lỗi (Cloudflare 5xx, Next.js error page...)
-      // thì res.json() sẽ throw SyntaxError và crash app trên iPad.
-      const isJson = res.headers.get("content-type")?.includes("application/json");
-      if (!isJson) {
-        throw new Error(`HTTP ${res.status} — server trả về nội dung không phải JSON`);
+      // Bước 1: Lấy content-type
+      const contentType = res.headers.get("content-type");
+
+      // Bước 2: Thoát sớm nếu không phải JSON — tuyệt đối không gọi res.json()
+      // (server có thể trả HTML lỗi từ Cloudflare/Next.js → res.json() crash iPad)
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Server error: Không định dạng được JSON");
       }
 
+      // Bước 3: Parse JSON (an toàn vì đã xác nhận content-type ở trên)
       const json = (await res.json()) as { url?: string; error?: string };
 
+      // Bước 4: Kiểm tra kết quả
       if (!res.ok || !json.url) {
         throw new Error(json.error ?? `HTTP ${res.status}`);
       }
