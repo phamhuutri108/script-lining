@@ -9,6 +9,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
+export const runtime = "edge";
+
 // ─── R2 Client (singleton, lazy init) ─────────────────────────────────────────
 
 function getR2Client(): S3Client {
