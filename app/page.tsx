@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ShotlistTable } from "@/components/shotlist/ShotlistTable";
 import { PdfRenderer, type PdfTextExtractionData } from "@/components/workspace/PdfRenderer";
-import { FabricTramlineCanvas } from "@/components/workspace/FabricTramlineCanvas";
+import { FabricTramlineCanvas, type FabricZoomControls } from "@/components/workspace/FabricTramlineCanvas";
 import { type DrawMode } from "@/lib/hooks/useFabricCanvas";
 import { useScriptStore, type ITramline, type IShotlistRow } from "@/lib/store/useScriptStore";
 import { generateStressData } from "@/lib/utils/stress-test";
@@ -50,11 +50,26 @@ const MOCK_SHOTLIST: IShotlistRow[] = [
 interface LiningToolbarProps {
   drawMode: DrawMode;
   onDrawModeChange: (mode: DrawMode) => void;
+  // Zoom / Pan controls
+  isPanMode: boolean;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onResetZoom: () => void;
+  onTogglePanMode: () => void;
 }
 
-function LiningToolbar({ drawMode, onDrawModeChange }: Readonly<LiningToolbarProps>) {
+function LiningToolbar({
+  drawMode,
+  onDrawModeChange,
+  isPanMode,
+  onZoomIn,
+  onZoomOut,
+  onResetZoom,
+  onTogglePanMode,
+}: Readonly<LiningToolbarProps>) {
   // Nhóm 1: Scene group (Break Scene)
   // Nhóm 2: Draw group (Select, Draw, Split)
+  // Nhóm 3: Zoom/Pan group (Zoom In, Zoom Out, Fit, Hand)
   const sceneTools: { mode: DrawMode; label: string; icon: React.ReactNode }[] = [
     {
       mode: "breakscene",
@@ -102,21 +117,28 @@ function LiningToolbar({ drawMode, onDrawModeChange }: Readonly<LiningToolbarPro
 
   const isBreakSceneMode = drawMode === "breakscene";
 
-  const renderBtn = (mode: DrawMode, label: string, icon: React.ReactNode, accent: string, accentBg: string, accentBorder: string) => (
+  const renderDrawBtn = (mode: DrawMode, label: string, icon: React.ReactNode, accent: string, accentBg: string, accentBorder: string) => (
     <button
       key={mode}
       onClick={() => onDrawModeChange(mode)}
       title={label}
-      className="flex flex-col items-center gap-0.5 px-2 py-2 rounded-md transition-colors"
+      className="flex flex-col items-center gap-0.5 rounded-md transition-colors"
       style={{
         background: drawMode === mode ? accentBg : "transparent",
         color: drawMode === mode ? accent : "#71717A",
         border: drawMode === mode ? `1px solid ${accentBorder}` : "1px solid transparent",
-        minWidth: 40,
+        // Apple HIG: minimum 44×44px touch target
+        minWidth: 44,
+        minHeight: 44,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "6px 4px",
       }}
     >
       {icon}
-      <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 600, letterSpacing: "0.05em" }}>
+      <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 600, letterSpacing: "0.05em", marginTop: 2 }}>
         {label.toUpperCase()}
       </span>
     </button>
@@ -130,7 +152,7 @@ function LiningToolbar({ drawMode, onDrawModeChange }: Readonly<LiningToolbarPro
       {/* Scene group */}
       <div className="flex flex-col gap-1">
         {sceneTools.map(({ mode, label, icon }) =>
-          renderBtn(mode, label, icon, "#6366f1", "rgba(99,102,241,0.13)", "rgba(99,102,241,0.35)")
+          renderDrawBtn(mode, label, icon, "#6366f1", "rgba(99,102,241,0.13)", "rgba(99,102,241,0.35)")
         )}
       </div>
 
@@ -147,8 +169,137 @@ function LiningToolbar({ drawMode, onDrawModeChange }: Readonly<LiningToolbarPro
         }}
       >
         {drawTools.map(({ mode, label, icon }) =>
-          renderBtn(mode, label, icon, "#16a34a", "rgba(25,230,111,0.15)", "rgba(25,230,111,0.3)")
+          renderDrawBtn(mode, label, icon, "#16a34a", "rgba(25,230,111,0.15)", "rgba(25,230,111,0.3)")
         )}
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: 1, background: "rgba(24,24,27,0.1)", margin: "0 2px" }} />
+
+      {/* Zoom / Pan group — 4 nút, tối thiểu 44×44px (Apple HIG) */}
+      <div className="flex flex-col gap-1">
+
+        {/* Zoom In */}
+        <button
+          onClick={onZoomIn}
+          title="Zoom In (Ctrl + scroll)"
+          style={{
+            minWidth: 44, minHeight: 44,
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            gap: 2, padding: "6px 4px",
+            background: "transparent",
+            color: "#71717A",
+            border: "1px solid transparent",
+            borderRadius: 6,
+            transition: "background 0.12s, color 0.12s",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(24,24,27,0.07)"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            <line x1="11" y1="8" x2="11" y2="14" />
+            <line x1="8" y1="11" x2="14" y2="11" />
+          </svg>
+          <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 600, letterSpacing: "0.05em" }}>
+            ZOOM+
+          </span>
+        </button>
+
+        {/* Zoom Out */}
+        <button
+          onClick={onZoomOut}
+          title="Zoom Out (Ctrl + scroll)"
+          style={{
+            minWidth: 44, minHeight: 44,
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            gap: 2, padding: "6px 4px",
+            background: "transparent",
+            color: "#71717A",
+            border: "1px solid transparent",
+            borderRadius: 6,
+            transition: "background 0.12s, color 0.12s",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(24,24,27,0.07)"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            <line x1="8" y1="11" x2="14" y2="11" />
+          </svg>
+          <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 600, letterSpacing: "0.05em" }}>
+            ZOOM−
+          </span>
+        </button>
+
+        {/* Fit Screen (Reset Zoom) */}
+        <button
+          onClick={onResetZoom}
+          title="Fit Screen — reset zoom & pan"
+          style={{
+            minWidth: 44, minHeight: 44,
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            gap: 2, padding: "6px 4px",
+            background: "transparent",
+            color: "#71717A",
+            border: "1px solid transparent",
+            borderRadius: 6,
+            transition: "background 0.12s, color 0.12s",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(24,24,27,0.07)"; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+            <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+            <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+            <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+          </svg>
+          <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 600, letterSpacing: "0.05em" }}>
+            FIT
+          </span>
+        </button>
+
+        {/* Hand Tool (Pan Mode) — active khi isPanMode=true */}
+        <button
+          onClick={onTogglePanMode}
+          title={isPanMode ? "Pan Mode — đang bật (nhấn để tắt)" : "Pan Mode — kéo để di chuyển"}
+          style={{
+            minWidth: 44, minHeight: 44,
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            gap: 2, padding: "6px 4px",
+            // Active state: màu amber nổi bật, dễ nhận ra trên iPad
+            background: isPanMode ? "rgba(245,158,11,0.15)" : "transparent",
+            color: isPanMode ? "#d97706" : "#71717A",
+            border: isPanMode ? "1px solid rgba(245,158,11,0.35)" : "1px solid transparent",
+            borderRadius: 6,
+            transition: "background 0.12s, color 0.12s, border-color 0.12s",
+            cursor: "pointer",
+          }}
+          onMouseEnter={(e) => {
+            if (!isPanMode) (e.currentTarget as HTMLButtonElement).style.background = "rgba(24,24,27,0.07)";
+          }}
+          onMouseLeave={(e) => {
+            if (!isPanMode) (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+          }}
+        >
+          {/* Hand / palm icon */}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2" />
+            <path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v2" />
+            <path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8" />
+            <path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+          </svg>
+          <span style={{ fontSize: 9, fontFamily: "Space Grotesk, sans-serif", fontWeight: 600, letterSpacing: "0.05em" }}>
+            {isPanMode ? "PAN ●" : "PAN"}
+          </span>
+        </button>
+
       </div>
     </div>
   );
@@ -168,6 +319,26 @@ export default function HomePage() {
   const [uploadState, setUploadState] = useState<"idle" | "uploading" | "error">("idle");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ── Zoom / Pan state — shared across ALL canvas instances ──────────────────
+  const [isPanMode, setIsPanMode] = useState(false);
+  /**
+   * Registry: pageNumber → FabricZoomControls
+   * Khi zoomIn/Out/Fit được nhấn, gọi đồng thời trên tất cả canvas đang hiển thị.
+   */
+  const zoomControlsMapRef = useRef(new Map<number, FabricZoomControls>());
+
+  const togglePanMode = useCallback(() => setIsPanMode((p) => !p), []);
+
+  const handleZoomIn = useCallback(() => {
+    zoomControlsMapRef.current.forEach((c) => c.zoomIn());
+  }, []);
+  const handleZoomOut = useCallback(() => {
+    zoomControlsMapRef.current.forEach((c) => c.zoomOut());
+  }, []);
+  const handleResetZoom = useCallback(() => {
+    zoomControlsMapRef.current.forEach((c) => c.resetZoom());
+  }, []);
 
   useEffect(() => {
     hydrate(MOCK_TRAMLINES, MOCK_SHOTLIST);
@@ -237,14 +408,22 @@ export default function HomePage() {
   }, [setPdfTextForPage]);
 
   // ── renderOverlay: inject FabricTramlineCanvas vào mỗi trang PDF ──────────
+  // Truyền isPanMode và controls registry callbacks xuống mỗi canvas instance.
   const renderOverlay = useCallback(({ pageNumber, width, height }: { pageNumber: number; width: number; height: number }) => (
     <FabricTramlineCanvas
       pageNumber={pageNumber}
       width={width}
       height={height}
       drawMode={drawMode}
+      isPanMode={isPanMode}
+      onControlsReady={(controls) => {
+        zoomControlsMapRef.current.set(pageNumber, controls);
+      }}
+      onControlsDestroyed={() => {
+        zoomControlsMapRef.current.delete(pageNumber);
+      }}
     />
-  ), [drawMode]);
+  ), [drawMode, isPanMode]);
 
   return (
     <main className="h-screen flex flex-col overflow-hidden" style={{ background: "#F8F7F4" }}>
@@ -380,9 +559,19 @@ export default function HomePage() {
         )}
 
         {activeTab === "LINE SCRIPT" && (
-          <div className="relative h-full flex">
+          /* touch-action: none — ngăn Safari/Chrome tự cuộn trang khi vuốt trên canvas.
+             Mọi touch event được Fabric.js và custom handlers xử lý hoàn toàn. */
+          <div className="relative h-full flex" style={{ touchAction: "none" }}>
             {/* Lining Toolbar (bên trái, nổi trên PDF) */}
-            <LiningToolbar drawMode={drawMode} onDrawModeChange={setDrawMode} />
+            <LiningToolbar
+              drawMode={drawMode}
+              onDrawModeChange={setDrawMode}
+              isPanMode={isPanMode}
+              onZoomIn={handleZoomIn}
+              onZoomOut={handleZoomOut}
+              onResetZoom={handleResetZoom}
+              onTogglePanMode={togglePanMode}
+            />
 
             {/* PDF + Fabric Canvas overlay */}
             <PdfRenderer

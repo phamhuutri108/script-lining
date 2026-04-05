@@ -6,6 +6,7 @@
  * ## Tính năng:
  *   - Render tramlines + break scenes qua useFabricCanvas hook.
  *   - Khi Break Scene Mode: double-click label → hiện <input> overlay để sửa scene#.
+ *   - Nhận isPanMode từ ngoài (page.tsx) và báo zoomControls ngược lên qua onControlsReady.
  *
  * ## pointer-events strategy:
  *   draw / split / breakscene → "auto"  — Fabric bắt tất cả mouse events
@@ -21,11 +22,31 @@ import { useScriptStore } from "@/lib/store/useScriptStore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+/** Zoom controls được expose lên parent (page.tsx) qua onControlsReady. */
+export interface FabricZoomControls {
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetZoom: () => void;
+  fitScreen: () => void;
+}
+
 export interface FabricTramlineCanvasProps {
   pageNumber: number;
   width: number;
   height: number;
   drawMode: DrawMode;
+  /**
+   * Pan mode được điều khiển từ page.tsx.
+   * Khi true, chuột trái kéo sẽ pan thay vì vẽ.
+   */
+  isPanMode?: boolean;
+  /**
+   * Callback khi canvas sẵn sàng — cung cấp zoom control functions cho parent.
+   * Page.tsx lưu các controls này để gắn vào toolbar buttons.
+   */
+  onControlsReady?: (controls: FabricZoomControls) => void;
+  /** Cleanup: gọi khi component unmount để parent xoá controls khỏi registry. */
+  onControlsDestroyed?: () => void;
 }
 
 interface EditState {
@@ -41,6 +62,9 @@ export function FabricTramlineCanvas({
   width,
   height,
   drawMode,
+  isPanMode,
+  onControlsReady,
+  onControlsDestroyed,
 }: Readonly<FabricTramlineCanvasProps>) {
   const [canvasEl, setCanvasEl]     = useState<HTMLCanvasElement | null>(null);
   const [editState, setEditState]   = useState<EditState | null>(null);
@@ -93,15 +117,30 @@ export function FabricTramlineCanvas({
     [confirmEdit, cancelEdit],
   );
 
-  // Hook khởi tạo Fabric.js và handle tất cả logic vẽ
-  useFabricCanvas({
+  // Hook khởi tạo Fabric.js và handle tất cả logic vẽ + zoom/pan
+  const { zoomIn, zoomOut, resetZoom, fitScreen } = useFabricCanvas({
     canvasEl,
     pageNumber,
     width,
     height,
     drawMode,
+    isPanMode,
     onBreakSceneDblClick: handleBreakSceneDblClick,
   });
+
+  // ── Báo zoom controls lên parent (page.tsx) ─────────────────────────────
+  // Dùng stable ref pattern cho onControlsDestroyed để tránh re-registration
+  // không cần thiết khi prop thay đổi giữa re-renders.
+  const onControlsDestroyedRef = useRef(onControlsDestroyed);
+  useEffect(() => { onControlsDestroyedRef.current = onControlsDestroyed; }, [onControlsDestroyed]);
+
+  useEffect(() => {
+    onControlsReady?.({ zoomIn, zoomOut, resetZoom, fitScreen });
+    return () => { onControlsDestroyedRef.current?.(); };
+    // zoomIn/Out/resetZoom/fitScreen là stable useCallback([], [])
+    // Effect chỉ re-run khi onControlsReady thay đổi (tức là khi renderOverlay recreate)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [zoomIn, zoomOut, resetZoom, fitScreen, onControlsReady]);
 
   const isInteractive = drawMode !== "idle";
 

@@ -10,6 +10,19 @@
  *   breakscene — click tạo đường break scene ngang, kéo lên/xuống, Delete xóa,
  *                double-click label để sửa scene#
  *
+ * ## Zoom/Pan:
+ *   - Ctrl/Meta + scroll wheel → Zoom (desktop)
+ *   - Plain scroll → Pan (desktop)
+ *   - 2-finger pinch → Zoom (iPad)
+ *   - 2-finger swipe → Pan (iPad)
+ *   - 1-finger / Apple Pencil → vẽ Tramline bình thường
+ *   - isPanMode=true → chuột trái kéo để Pan (desktop override)
+ *
+ * ## Coordinate accuracy:
+ *   Tất cả handler dùng e.scenePoint (Fabric v7) — đây là toạ độ canvas space
+ *   đã tính ngược viewport transform (zoom + pan), nên line vẽ ra luôn khớp
+ *   100% với nội dung PDF bên dưới bất kể mức zoom.
+ *
  * ## Performance:
  *   Module-level _fab cache — fabric load 1 lần duy nhất, render sync sau đó.
  *
@@ -20,7 +33,7 @@
 
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import type { Point } from "fabric";
 import {
   useScriptStore,
@@ -68,6 +81,11 @@ const BS_LABEL_PAD_X     = 6;
 const BS_LABEL_PAD_Y     = 3;
 const BS_ACTIVE_RADIUS   = 18;
 
+// Zoom/Pan constants
+const MIN_ZOOM  = 0.25;
+const MAX_ZOOM  = 8;
+const ZOOM_STEP = 0.15;   // bước zoom cho nút zoomIn/zoomOut
+
 export const TRAMLINE_PALETTE = [
   "#19e66f", "#f59e0b", "#3b82f6", "#ec4899",
   "#8b5cf6", "#ef4444", "#06b6d4", "#84cc16",
@@ -101,6 +119,13 @@ interface BSDragState {
   id: string;
   origY: number;
   previewY: number;
+}
+
+interface TouchTrackState {
+  initialDist: number;
+  initialZoom: number;
+  lastMidX: number;
+  lastMidY: number;
 }
 
 // ─── Pointer event info shape ─────────────────────────────────────────────────
@@ -340,6 +365,12 @@ export interface UseFabricCanvasOptions {
   height: number;
   drawMode: DrawMode;
   /**
+   * Controlled pan mode từ parent component.
+   * Nếu được cung cấp, override internal useState — dùng khi page.tsx quản lý isPanMode.
+   * Nếu không cung cấp, hook tự quản lý isPanMode qua togglePanMode().
+   */
+  isPanMode?: boolean;
+  /**
    * Callback khi user double-click lên Break Scene label để sửa scene#.
    * FabricTramlineCanvas sẽ render <input> overlay tại vị trí y.
    */
@@ -348,6 +379,18 @@ export interface UseFabricCanvasOptions {
 
 export interface UseFabricCanvasReturn {
   dispose: () => void;
+  /** Zoom in vào tâm canvas (tăng ZOOM_STEP %) */
+  zoomIn: () => void;
+  /** Zoom out khỏi tâm canvas (giảm ZOOM_STEP %) */
+  zoomOut: () => void;
+  /** Reset zoom = 1 và pan về gốc toạ độ */
+  resetZoom: () => void;
+  /** Fit screen: đặt lại toàn bộ viewport transform về mặc định */
+  fitScreen: () => void;
+  /** Bật/tắt chế độ pan bằng chuột trái kéo (desktop) */
+  togglePanMode: () => void;
+  /** true khi pan mode đang bật */
+  isPanMode: boolean;
 }
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
@@ -358,6 +401,7 @@ export function useFabricCanvas({
   width,
   height,
   drawMode,
+  isPanMode: isPanModeProp,
   onBreakSceneDblClick,
 }: UseFabricCanvasOptions): UseFabricCanvasReturn {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -369,6 +413,22 @@ export function useFabricCanvas({
   const activeRef            = useRef<ActiveBracket | null>(null);
   const bsDragRef            = useRef<BSDragState | null>(null);
   const activeBreakSceneRef  = useRef<string | null>(null);
+
+  // ── Zoom / Pan refs ────────────────────────────────────────────────────────
+  const zoomRef         = useRef(1);               // current zoom level
+  const isPanModeRef    = useRef(false);           // synced with isPanMode state
+  const isPanningRef    = useRef(false);           // currently dragging (pan mode)
+  const lastPanPtRef    = useRef({ x: 0, y: 0 }); // last client point during pan drag
+  const touchTrackRef   = useRef<TouchTrackState | null>(null); // 2-finger touch state
+
+  // ── Pan mode: controlled (prop) hoặc uncontrolled (internal state) ──────
+  // Nếu isPanModeProp được cung cấp từ ngoài (page.tsx), dùng nó (controlled).
+  // Nếu không, tự quản lý qua internalPanMode + togglePanMode (uncontrolled).
+  const [internalPanMode, setInternalPanMode] = useState(false);
+  const isPanMode = isPanModeProp !== undefined ? isPanModeProp : internalPanMode;
+
+  // Keep ref in sync với effective pan mode (tránh stale closure trong event handlers)
+  useEffect(() => { isPanModeRef.current = isPanMode; }, [isPanMode]);
 
   // Stable ref for dblclick callback (avoids re-creating effect on every render)
   const dblClickCbRef = useRef(onBreakSceneDblClick);
@@ -418,11 +478,12 @@ export function useFabricCanvas({
     canvas.requestRenderAll();
   }, [tramlines, breakScenes, pageNumber, width]);
 
-  // ── Init Fabric Canvas ──────────────────────────────────────────────────────
+  // ── Init Fabric Canvas + Wheel & Touch Zoom/Pan ─────────────────────────────
 
   useEffect(() => {
     if (!canvasEl) return;
     let disposed = false;
+    const cleanupList: VoidFunction[] = [];
 
     (async () => {
       const fab = await loadFabric();
@@ -436,10 +497,109 @@ export function useFabricCanvas({
       });
       fabricRef.current = fc;
       renderAllSync();
+
+      // ── mouse:wheel — Ctrl/Meta+scroll=Zoom, plain scroll=Pan ────────────
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const handleWheel = (opt: any) => {
+        const e = opt.e as WheelEvent;
+        e.preventDefault();
+
+        if (e.ctrlKey || e.metaKey) {
+          // Zoom vào/ra tại vị trí con trỏ
+          let zoom = fc.getZoom();
+          zoom *= 0.999 ** e.deltaY;
+          zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom));
+          // offsetX/Y là toạ độ trong canvas element space — Fabric dùng trực tiếp
+          fc.zoomToPoint({ x: e.offsetX, y: e.offsetY }, zoom);
+          zoomRef.current = zoom;
+        } else {
+          // Pan: dịch chuyển viewport theo deltaX / deltaY
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const vpt = (fc.viewportTransform as number[]).slice() as any;
+          vpt[4] -= e.deltaX;
+          vpt[5] -= e.deltaY;
+          fc.setViewportTransform(vpt);
+        }
+        fc.requestRenderAll();
+      };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cleanupList.push(fc.on("mouse:wheel" as any, handleWheel));
+
+      // ── Multi-touch: 2-finger Pinch=Zoom + 2-finger Swipe=Pan (iPad) ────
+      // 1-finger hoặc Apple Pencil (pointerType='pen') không bị chặn ở đây
+      // → vẫn đến Fabric bình thường → vẽ Tramline như cũ.
+
+      const handleTouchStart = (e: TouchEvent) => {
+        if (e.touches.length !== 2) return;
+        // Chặn browser pinch-zoom, nhưng không preventDefault trên 1-finger
+        e.preventDefault();
+        const t0 = e.touches[0];
+        const t1 = e.touches[1];
+        const midX = (t0.clientX + t1.clientX) / 2;
+        const midY = (t0.clientY + t1.clientY) / 2;
+        touchTrackRef.current = {
+          initialDist: Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY),
+          initialZoom: fc.getZoom(),
+          lastMidX: midX,
+          lastMidY: midY,
+        };
+      };
+
+      const handleTouchMove = (e: TouchEvent) => {
+        if (e.touches.length !== 2 || !touchTrackRef.current) return;
+        e.preventDefault();
+
+        const track = touchTrackRef.current;
+        const t0 = e.touches[0];
+        const t1 = e.touches[1];
+        const dist  = Math.hypot(t0.clientX - t1.clientX, t0.clientY - t1.clientY);
+        const midX  = (t0.clientX + t1.clientX) / 2;
+        const midY  = (t0.clientY + t1.clientY) / 2;
+
+        // 1) Pinch Zoom — tính tỷ lệ từ khoảng cách ban đầu
+        let newZoom = track.initialZoom * (dist / track.initialDist);
+        newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, newZoom));
+
+        // Chuyển client midpoint → canvas element offset (xử lý CSS scaling)
+        const el   = fc.getElement() as HTMLCanvasElement;
+        const rect = el.getBoundingClientRect();
+        const cx   = midX - rect.left;
+        const cy   = midY - rect.top;
+
+        fc.zoomToPoint({ x: cx, y: cy }, newZoom);
+        zoomRef.current = newZoom;
+
+        // 2) 2-finger Pan — delta của midpoint giữa 2 ngón
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const vpt = (fc.viewportTransform as number[]).slice() as any;
+        vpt[4] += midX - track.lastMidX;
+        vpt[5] += midY - track.lastMidY;
+        fc.setViewportTransform(vpt);
+
+        // Cập nhật lastMid cho frame tiếp theo
+        track.lastMidX = midX;
+        track.lastMidY = midY;
+
+        fc.requestRenderAll();
+      };
+
+      const handleTouchEnd = () => {
+        touchTrackRef.current = null;
+      };
+
+      canvasEl.addEventListener("touchstart", handleTouchStart, { passive: false });
+      canvasEl.addEventListener("touchmove",  handleTouchMove,  { passive: false });
+      canvasEl.addEventListener("touchend",   handleTouchEnd);
+      cleanupList.push(() => {
+        canvasEl.removeEventListener("touchstart", handleTouchStart);
+        canvasEl.removeEventListener("touchmove",  handleTouchMove);
+        canvasEl.removeEventListener("touchend",   handleTouchEnd);
+      });
     })();
 
     return () => {
       disposed = true;
+      cleanupList.forEach((fn) => fn());
       fabricRef.current?.dispose();
       fabricRef.current = null;
     };
@@ -452,6 +612,63 @@ export function useFabricCanvas({
     if (!fabricRef.current) return;
     renderAllSync();
   }, [renderAllSync]);
+
+  // ── Pan Mode — mouse drag pan (desktop) ─────────────────────────────────────
+  // Khi isPanMode=true, chuột trái kéo để di chuyển viewport.
+  // Các draw handler bên dưới sẽ bail sớm nhờ isPanModeRef.current.
+
+  useEffect(() => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+    if (!isPanMode) {
+      canvas.defaultCursor = "default";
+      return;
+    }
+
+    canvas.defaultCursor = "grab";
+    const disposers: VoidFunction[] = [];
+
+    const onDown = (e: FabricPointerEvent) => {
+      const ne = e.e as MouseEvent;
+      // Chỉ xử lý click chuột (không phải stylus/touch đến qua Fabric)
+      if (typeof ne.clientX !== "number") return;
+      isPanningRef.current = true;
+      lastPanPtRef.current = { x: ne.clientX, y: ne.clientY };
+      canvas.defaultCursor = "grabbing";
+    };
+
+    const onMove = (e: FabricPointerEvent) => {
+      if (!isPanningRef.current) return;
+      const ne = e.e as MouseEvent;
+      const dx = ne.clientX - lastPanPtRef.current.x;
+      const dy = ne.clientY - lastPanPtRef.current.y;
+      lastPanPtRef.current = { x: ne.clientX, y: ne.clientY };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const vpt = (canvas.viewportTransform as number[]).slice() as any;
+      vpt[4] += dx;
+      vpt[5] += dy;
+      canvas.setViewportTransform(vpt);
+      canvas.requestRenderAll();
+    };
+
+    const onUp = () => {
+      isPanningRef.current = false;
+      if (isPanModeRef.current) canvas.defaultCursor = "grab";
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    disposers.push(canvas.on("mouse:down" as any, onDown as any));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    disposers.push(canvas.on("mouse:move" as any, onMove as any));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    disposers.push(canvas.on("mouse:up"   as any, onUp   as any));
+
+    return () => {
+      disposers.forEach((d) => d());
+      isPanningRef.current = false;
+      if (fabricRef.current) fabricRef.current.defaultCursor = "default";
+    };
+  }, [isPanMode]);
 
   // ── Draw Mode events ─────────────────────────────────────────────────────────
 
@@ -467,6 +684,8 @@ export function useFabricCanvas({
     const disposers: VoidFunction[] = [];
 
     const onDown = async (e: FabricPointerEvent) => {
+      // Pan mode takes priority — do not start drawing
+      if (isPanModeRef.current) return;
       const pt = e.scenePoint;
       if (!pt) return;
       const fab = await loadFabric();
@@ -489,6 +708,7 @@ export function useFabricCanvas({
     };
 
     const onMove = (e: FabricPointerEvent) => {
+      if (isPanModeRef.current) return;
       const pt = e.scenePoint;
       if (!pt || !ds.isDrawing || !ds.previewLine) return;
       ds.previewLine.set({ x2: ds.startX, y2: pt.y });
@@ -496,6 +716,7 @@ export function useFabricCanvas({
     };
 
     const onUp = (e: FabricPointerEvent) => {
+      if (isPanModeRef.current) return;
       if (!ds.isDrawing) return;
       ds.isDrawing = false;
       if (ds.previewLine)   canvas.remove(ds.previewLine);
@@ -542,6 +763,7 @@ export function useFabricCanvas({
     const disposers: VoidFunction[] = [];
 
     const onDown = (e: FabricPointerEvent) => {
+      if (isPanModeRef.current) return;
       const pt = e.scenePoint;
       if (!pt) return;
       const pageTrams = tramlines.filter((t) => t.pageNumber === pageNumber);
@@ -576,6 +798,7 @@ export function useFabricCanvas({
     };
 
     const onMove = (e: FabricPointerEvent) => {
+      if (isPanModeRef.current) return;
       const pt = e.scenePoint;
       if (!pt) return;
       if (dragRef.current) {
@@ -597,6 +820,7 @@ export function useFabricCanvas({
     };
 
     const onUp = () => {
+      if (isPanModeRef.current) return;
       const drag = dragRef.current;
       if (!drag) return;
       dragRef.current = null;
@@ -664,6 +888,7 @@ export function useFabricCanvas({
     };
 
     const onDown = (e: FabricPointerEvent) => {
+      if (isPanModeRef.current) return;
       const pt = e.scenePoint;
       if (!pt) return;
 
@@ -700,6 +925,7 @@ export function useFabricCanvas({
     };
 
     const onMove = (e: FabricPointerEvent) => {
+      if (isPanModeRef.current) return;
       const pt = e.scenePoint;
       if (!pt) return;
 
@@ -714,6 +940,7 @@ export function useFabricCanvas({
     };
 
     const onUp = () => {
+      if (isPanModeRef.current) return;
       const drag = bsDragRef.current;
       if (!drag) return;
       bsDragRef.current = null;
@@ -724,6 +951,7 @@ export function useFabricCanvas({
     };
 
     const onDblClick = (e: FabricPointerEvent) => {
+      if (isPanModeRef.current) return;
       const pt = e.scenePoint;
       if (!pt) return;
       // Check if click is in the label area (left side, near break scene y)
@@ -767,10 +995,71 @@ export function useFabricCanvas({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [drawMode, removeBS]);
 
+  // ── Zoom / Pan control callbacks ─────────────────────────────────────────────
+
+  /**
+   * Zoom in vào tâm canvas.
+   * scenePoint vẫn được Fabric tính đúng sau khi zoom vì ta dùng zoomToPoint.
+   */
+  const zoomIn = useCallback(() => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+    const center = canvas.getCenter();
+    const newZoom = Math.min(MAX_ZOOM, canvas.getZoom() * (1 + ZOOM_STEP));
+    canvas.zoomToPoint({ x: center.left, y: center.top }, newZoom);
+    zoomRef.current = newZoom;
+    canvas.requestRenderAll();
+  }, []);
+
+  /** Zoom out khỏi tâm canvas. */
+  const zoomOut = useCallback(() => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+    const center = canvas.getCenter();
+    const newZoom = Math.max(MIN_ZOOM, canvas.getZoom() / (1 + ZOOM_STEP));
+    canvas.zoomToPoint({ x: center.left, y: center.top }, newZoom);
+    zoomRef.current = newZoom;
+    canvas.requestRenderAll();
+  }, []);
+
+  /**
+   * Reset zoom = 1 và pan = (0,0).
+   * viewportTransform = [scaleX, skewY, skewX, scaleY, translateX, translateY]
+   * Identity = [1, 0, 0, 1, 0, 0]
+   */
+  const resetZoom = useCallback(() => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    zoomRef.current = 1;
+    canvas.requestRenderAll();
+  }, []);
+
+  /**
+   * Fit screen: đặt lại viewport để canvas vừa khít container.
+   * Với layout hiện tại canvas đã bằng kích thước trang PDF, nên reset = fit.
+   */
+  const fitScreen = useCallback(() => {
+    const canvas = fabricRef.current;
+    if (!canvas) return;
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+    zoomRef.current = 1;
+    canvas.requestRenderAll();
+  }, []);
+
+  /**
+   * Toggle pan mode.
+   * Chỉ có tác dụng trong uncontrolled mode (khi isPanMode prop không được cung cấp).
+   * Trong controlled mode, parent component tự toggle isPanMode.
+   */
+  const togglePanMode = useCallback(() => {
+    setInternalPanMode((prev) => !prev);
+  }, []);
+
   const dispose = useCallback(() => {
     fabricRef.current?.dispose();
     fabricRef.current = null;
   }, []);
 
-  return { dispose };
+  return { dispose, zoomIn, zoomOut, resetZoom, fitScreen, togglePanMode, isPanMode };
 }
