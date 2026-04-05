@@ -75,7 +75,7 @@ const BRACKET_DRAG_MIN   = 12;
 const BS_COLOR           = "#6366f1";
 const BS_COLOR_ACTIVE    = "#818cf8";
 const BS_LINE_WIDTH      = 1.5;
-const BS_HIT_Y           = 12;  // px hit tolerance trên trục Y
+const BS_HIT_Y           = 20;  // px hit tolerance trên trục Y (≥20 cho iPad finger)
 const BS_LABEL_FONT      = 10;
 const BS_LABEL_PAD_X     = 6;
 const BS_LABEL_PAD_Y     = 3;
@@ -332,17 +332,18 @@ function renderBreakSceneSync(
     selectable: false, evented: false,
   });
 
+  // Label đặt ở GIỮA trang (canvasWidth / 2) để dễ thấy và chạm trên iPad
   const label = new Group([bg, textObj], {
     ...base,
-    left: 8,
+    left: Math.round(canvasWidth / 2 - tw / 2),
     top: y - th / 2,
     data: { ...tag, type: "breakscene-label" },
   });
   objects.push(label);
 
-  // 3. Active indicator — solid circle around label
+  // 3. Active indicator — circle quanh label ở giữa
   if (isActive) {
-    const cx = 8 + tw / 2;
+    const cx = Math.round(canvasWidth / 2);
     objects.push(new Circle({
       left: cx, top: y,
       originX: "center", originY: "center",
@@ -877,9 +878,12 @@ export function useFabricCanvas({
     canvas.defaultCursor = "crosshair";
     const disposers: VoidFunction[] = [];
 
+    // Long-press timer cho iPad (500ms giữ → mở edit thay vì double-click)
+    let longPressTimer: ReturnType<typeof setTimeout> | null = null;
+
     const getPageBS = () => breakScenes.filter((bs) => bs.pageNumber === pageNumber);
 
-    /** Tìm break scene gần điểm pt theo trục Y. */
+    /** Tìm break scene gần điểm pt theo trục Y (full-width hit zone). */
     const hitTest = (pt: Point): IBreakScene | null => {
       for (const bs of getPageBS()) {
         if (Math.abs(pt.y - bs.y) <= BS_HIT_Y) return bs;
@@ -887,8 +891,16 @@ export function useFabricCanvas({
       return null;
     };
 
+    /** true nếu điểm pt nằm trong vùng label (center ± 60px theo trục X). */
+    const isNearLabel = (pt: Point) => Math.abs(pt.x - width / 2) <= 60;
+
+    const cancelLongPress = () => {
+      if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    };
+
     const onDown = (e: FabricPointerEvent) => {
       if (isPanModeRef.current) return;
+      cancelLongPress();
       const pt = e.scenePoint;
       if (!pt) return;
 
@@ -899,18 +911,31 @@ export function useFabricCanvas({
         bsDragRef.current = { id: hit.id, origY: hit.y, previewY: hit.y };
         canvas.defaultCursor = "ns-resize";
         renderAllSync();
+
+        // iPad: long-press trên vùng label → trigger edit (≡ double-click desktop)
+        if (isNearLabel(pt)) {
+          longPressTimer = setTimeout(() => {
+            longPressTimer = null;
+            const drag = bsDragRef.current;
+            // Chỉ trigger nếu chưa kéo đáng kể (phân biệt long-press với drag)
+            if (drag && Math.abs(drag.previewY - drag.origY) < 12) {
+              bsDragRef.current = null;  // huỷ drag — đây là long-press, không phải drag
+              dblClickCbRef.current?.(hit.id, hit.y, hit.sceneNumber);
+              renderAllSync();
+            }
+          }, 500);
+        }
         return;
       }
 
       // Click ngoài vùng break scene
       if (activeBreakSceneRef.current) {
-        // Bỏ chọn
         activeBreakSceneRef.current = null;
         renderAllSync();
         return;
       }
 
-      // Tạo break scene mới
+      // Tạo break scene mới tại vị trí click
       const existing = getPageBS();
       const existingNums = existing
         .map((bs) => parseInt(bs.sceneNumber, 10))
@@ -930,7 +955,14 @@ export function useFabricCanvas({
       if (!pt) return;
 
       if (bsDragRef.current) {
-        bsDragRef.current.previewY = Math.max(0, Math.min(height, pt.y));
+        const newY = Math.max(0, Math.min(height, pt.y));
+        bsDragRef.current.previewY = newY;
+
+        // Nếu kéo > 12px so với gốc → đây là drag thật, huỷ long-press
+        if (longPressTimer && Math.abs(newY - bsDragRef.current.origY) > 12) {
+          cancelLongPress();
+        }
+
         renderAllSync();
         return;
       }
@@ -941,6 +973,7 @@ export function useFabricCanvas({
 
     const onUp = () => {
       if (isPanModeRef.current) return;
+      cancelLongPress();
       const drag = bsDragRef.current;
       if (!drag) return;
       bsDragRef.current = null;
@@ -950,13 +983,13 @@ export function useFabricCanvas({
       }
     };
 
+    // Desktop: double-click trên vùng label giữa trang → edit
     const onDblClick = (e: FabricPointerEvent) => {
       if (isPanModeRef.current) return;
       const pt = e.scenePoint;
       if (!pt) return;
-      // Check if click is in the label area (left side, near break scene y)
       for (const bs of getPageBS()) {
-        if (pt.x >= 8 && pt.x <= 80 && Math.abs(pt.y - bs.y) <= 16) {
+        if (isNearLabel(pt) && Math.abs(pt.y - bs.y) <= BS_HIT_Y) {
           dblClickCbRef.current?.(bs.id, bs.y, bs.sceneNumber);
           return;
         }
@@ -973,12 +1006,13 @@ export function useFabricCanvas({
     disposers.push(canvas.on("mouse:dblclick" as any, onDblClick as any));
 
     return () => {
+      cancelLongPress();
       disposers.forEach((d) => d());
       bsDragRef.current = null;
       activeBreakSceneRef.current = null;
       canvas.defaultCursor = "default";
     };
-  }, [drawMode, pageNumber, breakScenes, height, addBreakScene, updateBS, renderAllSync]);
+  }, [drawMode, pageNumber, breakScenes, height, width, addBreakScene, updateBS, renderAllSync]);
 
   // ── Break Scene — Delete keyboard handler ────────────────────────────────
 
